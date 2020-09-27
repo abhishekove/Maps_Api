@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -20,8 +21,21 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -40,8 +54,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 return;
             }
             mMap.setMyLocationEnabled(true);
-//            mMap.getUiSettings().setMyLocationButtonEnabled(false);
-
         }
     }
 
@@ -99,6 +111,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void moveCamera(LatLng latLng, float zoom){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
+//        addOthers(latLng.latitude,latLng.longitude);
     }
 
     private void initMap(){
@@ -131,6 +144,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    public void addOthers(double lat, double lng){
+        String url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json" + "?location=" + lat + "," + lng + "&radius=5000" + "&type=" + "parking" + "&sensor=true" + "&key=" + getResources().getString(R.string.google_api);
+        Log.d(TAG, "addOthers: Here "+url);
+        new PlaceTask().execute(url);
+    }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         Log.d(TAG, "onRequestPermissionsResult: called.");
@@ -156,4 +175,80 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
+    private class PlaceTask extends AsyncTask<String,Integer,String> {
+        @Override
+        protected void onPostExecute(String s) {
+            Log.d(TAG, "onPostExecute: here");
+            new ParserTask().execute(s);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            String data = null;
+            Log.d(TAG, "doInBackground: here");
+            try {
+                data=downloadUrl(strings[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d(TAG, "doInBackground: "+e.getLocalizedMessage());
+            }
+            return data;
+        }
+    }
+
+    private String downloadUrl(String string) throws IOException {
+        URL url=new URL(string);
+        Log.d(TAG, "downloadUrl: here1");
+        HttpURLConnection connection= (HttpURLConnection) url.openConnection();
+        connection.connect();
+        InputStream stream=connection.getInputStream();
+        BufferedReader reader=new BufferedReader(new InputStreamReader(stream));
+        Log.d(TAG, "downloadUrl: here");
+        StringBuilder builder=new StringBuilder();
+        String line="";
+        while ((line=reader.readLine())!=null){
+            builder.append(line);
+        }
+        String data=builder.toString();
+        reader.close();
+        Log.d(TAG, "downloadUrl: "+data);
+        return data;
+    }
+
+    private class ParserTask extends AsyncTask<String,Integer, List<HashMap<String,String>>> {
+        @Override
+        protected List<HashMap<String, String>> doInBackground(String... strings) {
+            JsonParser jsonParser=new JsonParser();
+            List<HashMap<String,String>> mapList=null;
+            Log.d(TAG, "doInBackground: here");
+            JSONObject object=null;
+            try {
+                object=new JSONObject(strings[0]);
+                mapList=jsonParser.parseResult(object);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+                Log.d(TAG, "doInBackground: "+e.getLocalizedMessage());
+            }
+            return mapList;
+        }
+
+        @Override
+        protected void onPostExecute(List<HashMap<String, String>> hashMaps) {
+            Log.d(TAG, "onPostExecute: "+hashMaps.size());
+            for (int i=0;i<hashMaps.size();i++){
+                HashMap<String,String> hashMap=hashMaps.get(i);
+                double lat=Double.parseDouble(hashMap.get("lat"));
+                double lng=Double.parseDouble(hashMap.get("lng"));
+                String name=hashMap.get("name");
+                Log.d(TAG, "onPostExecute: here");
+//                Toast.makeText(MapActivity.this,name+String.valueOf(lat)+String.valueOf(lng),Toast.LENGTH_LONG).show();
+                LatLng latLng=new LatLng(lat,lng);
+                MarkerOptions options=new MarkerOptions();
+                options.position(latLng);
+                options.title(name);
+                mMap.addMarker(options);
+            }
+        }
+    }
 }
