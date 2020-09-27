@@ -1,13 +1,18 @@
 package com.dev.maps;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -51,20 +56,26 @@ public class Signup extends AppCompatActivity {
         name=findViewById(R.id.name);
         fcapacity=findViewById(R.id.fCapacity);
         owner=findViewById(R.id.owner);
-//        db.collection("parking").add(new parking(4,2,"12","Pimpri Parking","19.032803","73.101212","Jayesh")).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-//            @Override
-//            public void onSuccess(DocumentReference documentReference) {
-//                Toast.makeText(Signup.this,"Done",Toast.LENGTH_LONG).show();
-//            }
-//        }).addOnFailureListener(new OnFailureListener() {
-//            @Override
-//            public void onFailure(@NonNull Exception e) {
-//                Toast.makeText(Signup.this,e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
-//            }
-//        });
         stMp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ConnectivityManager connectivityManager= (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+                if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState()!= NetworkInfo.State.CONNECTED && connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState()!=NetworkInfo.State.CONNECTED){
+                    AlertDialog.Builder builder=new AlertDialog.Builder(Signup.this);
+                    builder.setMessage("Your Internet is off").setTitle("Network Alert");
+                    AlertDialog dialog=builder.create();
+                    dialog.show();
+                    return;
+                }
+                final LocationManager manager= (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+                    AlertDialog.Builder builder=new AlertDialog.Builder(Signup.this);
+                    builder.setMessage("Your GPS is off").setTitle("GPS Alert");
+                    AlertDialog dialog=builder.create();
+                    dialog.show();
+                    return;
+                }
+                Log.d(TAG, "onClick: check");
                 getLocationPermission();
             }
         });
