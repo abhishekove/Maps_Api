@@ -15,6 +15,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
 import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
@@ -44,6 +45,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -69,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
     CollectionReference collectionReference;
     List<parking> parkings=new ArrayList<>();
     List<Double> distance=new ArrayList<>();
-    SortedMap<Double,parking> smp=new TreeMap<>();
+    List<Pair<Double,parking>> smp=new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,13 +104,19 @@ public class MainActivity extends AppCompatActivity {
 
                 parkings.clear();
                 distance.clear();
-                for (Map.Entry<Double,parking> entry:smp.entrySet()){
-                    if (entry.getKey()>=mProgress){
-                        break;
-                    }
-                    distance.add(entry.getKey());
-                    parkings.add(entry.getValue());
+                for (Pair<Double,parking> pair:smp){
+//                    Log.d(TAG, "onDataChange: "+pair.first);
+                    if (pair.first>mProgress)break;
+                    distance.add(pair.first);
+                    parkings.add(pair.second);
                 }
+//                for (Map.Entry<Double,parking> entry:smp.entrySet()){
+//                    if (entry.getKey()>=mProgress){
+//                        break;
+//                    }
+//                    distance.add(entry.getKey());
+//                    parkings.add(entry.getValue());
+//                }
                 parkingAdapter adapter=new parkingAdapter(parkings,distance);
                 recyclerView.setAdapter(adapter);
                 Toast.makeText(getApplicationContext(),"seekbar touch stopped!"+mProgress, Toast.LENGTH_SHORT).show();
@@ -225,15 +234,25 @@ public class MainActivity extends AppCompatActivity {
                                     parkings.clear();
                                     for (DataSnapshot data:snapshot.getChildren()){
                                         parking park=data.getValue(parking.class);
-                                        Log.d(TAG, "onDataChange: "+park);
+
 //                                        parkings.add(park);
                                         LatLng destination=new LatLng(Double.parseDouble(park.getLat()),Double.parseDouble(park.getLng()));
 //                                        distance.add(getDistance(initial,destination));
-                                        smp.put(getDistance(initial,destination),park);
+//                                        Log.d(TAG, "onDataChange: "+park.getName()+" "+getDistance(initial,destination));
+//                                        smp.put(getDistance(initial,destination),park);
+                                        smp.add(new Pair<Double, parking>(getDistance(initial,destination),park));
                                     }
-                                    for (Map.Entry<Double,parking> entry:smp.entrySet()){
-                                        distance.add(entry.getKey());
-                                        parkings.add(entry.getValue());
+                                    Log.d(TAG, "onDataChange: "+smp.size());
+//                                    smp.sort(Sortbyroll);
+                                    Collections.sort(smp, new Sortbyroll());
+//                                    for (Map.Entry<Double,parking> entry:smp.entrySet()){
+//                                        distance.add(entry.getKey());
+//                                        parkings.add(entry.getValue());
+//                                    }
+                                    for (Pair<Double,parking> pair:smp){
+                                        Log.d(TAG, "onDataChange: "+pair.first);
+                                        distance.add(pair.first);
+                                        parkings.add(pair.second);
                                     }
                                     parkingAdapter adapter=new parkingAdapter(parkings,distance);
                                     recyclerView.setAdapter(adapter);
@@ -282,4 +301,17 @@ public class MainActivity extends AppCompatActivity {
         return distance;
     }
 
+    class Sortbyroll implements Comparator<Pair<Double,parking>>
+    {
+        @Override
+        public int compare(Pair<Double, parking> o1, Pair<Double, parking> o2) {
+            return Double.compare(o1.first,o2.first);
+        }
+        // Used for sorting in ascending order of
+        // roll number
+//        public int compare(Student a, Student b)
+//        {
+//            return a.rollno - b.rollno;
+//        }
+    }
 }
