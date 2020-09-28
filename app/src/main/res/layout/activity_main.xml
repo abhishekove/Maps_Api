@@ -12,7 +12,7 @@
         android:id="@+id/places"
         tools:listitem="@layout/place_card"
         android:layout_height="wrap_content"/>
-    <SeekBar
+    <com.warkiz.widget.IndicatorSeekBar
         android:layout_width="match_parent"
         app:layout_constraintTop_toBottomOf="@id/places"
         android:id="@+id/seek"

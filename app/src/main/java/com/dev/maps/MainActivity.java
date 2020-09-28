@@ -42,6 +42,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.warkiz.widget.IndicatorSeekBar;
+import com.warkiz.widget.OnSeekChangeListener;
+import com.warkiz.widget.SeekParams;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -67,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     Button button,addPlace;
-    SeekBar seekBar;
+    IndicatorSeekBar seekBar;
     RecyclerView recyclerView;
     CollectionReference collectionReference;
     List<parking> parkings=new ArrayList<>();
@@ -87,21 +90,21 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
 
 
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        seekBar.setOnSeekChangeListener(new OnSeekChangeListener() {
             Double mProgress=0.0;
             @Override
-            public void onProgressChanged(SeekBar seekBar, int progress,
-                                          boolean fromUser) {
-                mProgress=Double.parseDouble(String.valueOf(progress));
+            public void onSeeking(SeekParams seekParams) {
+//                seekParams.progress;
+                mProgress=Double.parseDouble(String.valueOf(seekParams.progress));
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
+            public void onStartTrackingTouch(IndicatorSeekBar seekBar) {
+
             }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
+            public void onStopTrackingTouch(IndicatorSeekBar seekBar) {
                 parkings.clear();
                 distance.clear();
                 for (Pair<Double,parking> pair:smp){
@@ -120,9 +123,44 @@ public class MainActivity extends AppCompatActivity {
                 parkingAdapter adapter=new parkingAdapter(parkings,distance);
                 recyclerView.setAdapter(adapter);
                 Toast.makeText(getApplicationContext(),"seekbar touch stopped!"+mProgress, Toast.LENGTH_SHORT).show();
-
             }
         });
+//        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            Double mProgress=0.0;
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int progress,
+//                                          boolean fromUser) {
+//                mProgress=Double.parseDouble(String.valueOf(progress));
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//
+//                parkings.clear();
+//                distance.clear();
+//                for (Pair<Double,parking> pair:smp){
+////                    Log.d(TAG, "onDataChange: "+pair.first);
+//                    if (pair.first>mProgress)break;
+//                    distance.add(pair.first);
+//                    parkings.add(pair.second);
+//                }
+////                for (Map.Entry<Double,parking> entry:smp.entrySet()){
+////                    if (entry.getKey()>=mProgress){
+////                        break;
+////                    }
+////                    distance.add(entry.getKey());
+////                    parkings.add(entry.getValue());
+////                }
+//                parkingAdapter adapter=new parkingAdapter(parkings,distance);
+//                recyclerView.setAdapter(adapter);
+//                Toast.makeText(getApplicationContext(),"seekbar touch stopped!"+mProgress, Toast.LENGTH_SHORT).show();
+//
+//            }
+//        });
 //        getLocationPermission();
         if (isServicesOK()){
             getLocationPermission();
