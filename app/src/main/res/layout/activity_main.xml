@@ -5,9 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-    <SeekBar
+
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:id="@+id/places"
+        tools:listitem="@layout/place_card"
+        android:layout_height="wrap_content"/>
+    <SeekBar
+        android:layout_width="match_parent"
+        app:layout_constraintTop_toBottomOf="@id/places"
         android:id="@+id/seek"
         android:layout_height="wrap_content"/>
     <Button

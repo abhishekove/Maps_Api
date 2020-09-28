@@ -27,6 +27,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -46,11 +47,15 @@ public class Signup extends AppCompatActivity {
     Button stMp;
     EditText name,tcapacity,fcapacity,owner;
 
+    FirebaseDatabase database;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signup);
         db = FirebaseFirestore.getInstance();
+
+        database= FirebaseDatabase.getInstance();
         stMp=findViewById(R.id.stMp);
         tcapacity=findViewById(R.id.tCapacity);
         name=findViewById(R.id.name);
@@ -90,7 +95,6 @@ public class Signup extends AppCompatActivity {
             if(ContextCompat.checkSelfPermission(this.getApplicationContext(),
                     COURSE_LOCATION) == PackageManager.PERMISSION_GRANTED){
                 mLocationPermissionsGranted = true;
-//                initMap();
                 getDeviceLocation();
             }else{
                 ActivityCompat.requestPermissions(this,
@@ -145,7 +149,7 @@ public class Signup extends AppCompatActivity {
 
 //                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
 //                                    DEFAULT_ZOOM);
-                            db.collection("parking").add(new parking(fcapacity.getText().toString(),tcapacity.getText().toString(),"12",name.getText().toString(),String.valueOf(currentLocation.getLongitude()),String.valueOf(currentLocation.getLatitude()),owner.getText().toString())).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            db.collection("parking").add(new parking(Long.parseLong(fcapacity.getText().toString()),tcapacity.getText().toString(),"12",name.getText().toString(),String.valueOf(currentLocation.getLongitude()),String.valueOf(currentLocation.getLatitude()),owner.getText().toString())).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
                                     Toast.makeText(Signup.this,"Done",Toast.LENGTH_LONG).show();

@@ -1,15 +1,25 @@
 package com.dev.maps;
 
-public class parking {
+import java.io.Serializable;
+
+public class parking implements Serializable {
     public parking() {
     }
 
-    private String fCapacity;
+    private Long fCapacity;
     private String tCapacity;
     private String time;
     private String name;
 
-    public parking(String fCapacity, String tCapacity, String time, String name, String lng, String lat, String owner) {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public parking(Long fCapacity, String tCapacity, String time, String name, String lng, String lat, String owner) {
         this.fCapacity = fCapacity;
         this.tCapacity = tCapacity;
         this.time = time;
@@ -37,7 +47,7 @@ public class parking {
         this.lat = lat;
     }
 
-    public parking(String fCapacity, String tCapacity, String time, String lng, String lat, String owner) {
+    public parking(Long fCapacity, String tCapacity, String time, String lng, String lat, String owner) {
         this.fCapacity = fCapacity;
         this.tCapacity = tCapacity;
         this.time = time;
@@ -46,11 +56,11 @@ public class parking {
         Owner = owner;
     }
 
-    public String getfCapacity() {
+    public Long getfCapacity() {
         return fCapacity;
     }
 
-    public void setfCapacity(String fCapacity) {
+    public void setfCapacity(Long fCapacity) {
         this.fCapacity = fCapacity;
     }
 
@@ -78,7 +88,7 @@ public class parking {
         Owner = owner;
     }
 
-    public parking(String fCapacity, String tCapacity, String time, String owner) {
+    public parking(Long fCapacity, String tCapacity, String time, String owner) {
         this.fCapacity = fCapacity;
         this.tCapacity = tCapacity;
         this.time = time;

@@ -75,6 +75,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_map);
 
         getLocationPermission();
+
     }
 
     private void getDeviceLocation(){
@@ -119,6 +120,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(MapActivity.this);
+    }
+    void addMarker(){
+        List<parking> parkings= (List<parking>) getIntent().getSerializableExtra("places");
+        for (parking park:parkings){
+            Log.d(TAG, "addMarker: "+park);
+        }
     }
 
     private void getLocationPermission(){
