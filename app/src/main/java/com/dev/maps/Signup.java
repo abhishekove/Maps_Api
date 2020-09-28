@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.NumberPicker;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -46,6 +47,7 @@ public class Signup extends AppCompatActivity {
     private FusedLocationProviderClient mFusedLocationProviderClient;
     Button stMp;
     EditText name,tcapacity,fcapacity,owner;
+    NumberPicker numberPicker;
 
     FirebaseDatabase database;
 
@@ -55,6 +57,9 @@ public class Signup extends AppCompatActivity {
         setContentView(R.layout.activity_signup);
         db = FirebaseFirestore.getInstance();
 
+        numberPicker=findViewById(R.id.parkTime);
+        numberPicker.setMaxValue(24);
+        numberPicker.setMinValue(1);
         database= FirebaseDatabase.getInstance();
         stMp=findViewById(R.id.stMp);
         tcapacity=findViewById(R.id.tCapacity);
@@ -149,19 +154,16 @@ public class Signup extends AppCompatActivity {
 
 //                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
 //                                    DEFAULT_ZOOM);
-                            db.collection("parking").add(new parking(Long.parseLong(fcapacity.getText().toString()),tcapacity.getText().toString(),"12",name.getText().toString(),String.valueOf(currentLocation.getLongitude()),String.valueOf(currentLocation.getLatitude()),owner.getText().toString())).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                            String key=FirebaseDatabase.getInstance().getReference().child("parking").push().getKey();
+                            FirebaseDatabase.getInstance().getReference().child("parking").child(key).setValue(new parking((fcapacity.getText().toString()),tcapacity.getText().toString(),String.valueOf(numberPicker.getValue()),name.getText().toString(),String.valueOf(currentLocation.getLongitude()),String.valueOf(currentLocation.getLatitude()),owner.getText().toString())).addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
-                                public void onSuccess(DocumentReference documentReference) {
+                                public void onSuccess(Void aVoid) {
                                     Toast.makeText(Signup.this,"Done",Toast.LENGTH_LONG).show();
                                 }
                             }).addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(Signup.this,e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
-                                    name.setText("");
-                                    fcapacity.setText("");
-                                    tcapacity.setText("");
-                                    owner.setText("");
+                                    Toast.makeText(Signup.this,"Try again "+e.getLocalizedMessage(),Toast.LENGTH_LONG).show();
                                 }
                             });
 

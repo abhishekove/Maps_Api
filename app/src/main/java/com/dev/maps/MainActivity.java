@@ -30,7 +30,10 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.EventListener;
@@ -214,21 +217,52 @@ public class MainActivity extends AppCompatActivity {
 //                            moveCamera(new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude()),
 //                                    DEFAULT_ZOOM);
                             final LatLng initial=new LatLng(currentLocation.getLatitude(),currentLocation.getLongitude());
-                            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                            FirebaseDatabase.getInstance().getReference().child("parking").addValueEventListener(new ValueEventListener() {
                                 @Override
-                                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
-                                    if (error!=null)return;
-                                    for (QueryDocumentSnapshot documentSnapshot:value){
-                                        parking park=documentSnapshot.toObject(parking.class);
-                                        parkings.add(park);
-                                        LatLng destination=new LatLng(Double.parseDouble(park.getLat()),Double.valueOf(park.getLng()));
-                                        distance.add(getDistance(initial,destination));
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    smp.clear();
+                                    distance.clear();
+                                    parkings.clear();
+                                    for (DataSnapshot data:snapshot.getChildren()){
+                                        parking park=data.getValue(parking.class);
+                                        Log.d(TAG, "onDataChange: "+park);
+//                                        parkings.add(park);
+                                        LatLng destination=new LatLng(Double.parseDouble(park.getLat()),Double.parseDouble(park.getLng()));
+//                                        distance.add(getDistance(initial,destination));
                                         smp.put(getDistance(initial,destination),park);
+                                    }
+                                    for (Map.Entry<Double,parking> entry:smp.entrySet()){
+                                        distance.add(entry.getKey());
+                                        parkings.add(entry.getValue());
                                     }
                                     parkingAdapter adapter=new parkingAdapter(parkings,distance);
                                     recyclerView.setAdapter(adapter);
                                 }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
                             });
+//                            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+//                                @Override
+//                                public void onEvent(@Nullable QuerySnapshot value, @Nullable FirebaseFirestoreException error) {
+//                                    if (error!=null)return;
+//                                    for (QueryDocumentSnapshot documentSnapshot:value){
+//                                        parking park=documentSnapshot.toObject(parking.class);
+////                                        parkings.add(park);
+//                                        LatLng destination=new LatLng(Double.parseDouble(park.getLat()),Double.parseDouble(park.getLng()));
+////                                        distance.add(getDistance(initial,destination));
+//                                        smp.put(getDistance(initial,destination),park);
+//                                    }
+//                                    for (Map.Entry<Double,parking> entry:smp.entrySet()){
+//                                        distance.add(entry.getKey());
+//                                        parkings.add(entry.getValue());
+//                                    }
+//                                    parkingAdapter adapter=new parkingAdapter(parkings,distance);
+//                                    recyclerView.setAdapter(adapter);
+//                                }
+//                            });
 
 
                         }else{

@@ -9,27 +9,38 @@
         android:layout_width="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         android:id="@+id/name"
+        android:hint="Enter name"
         android:layout_height="wrap_content"/>
     <EditText
         android:layout_width="match_parent"
         app:layout_constraintTop_toBottomOf="@id/name"
         android:id="@+id/fCapacity"
+        android:hint="Enter Four wheeler capacity"
         android:layout_height="wrap_content"/>
     <EditText
         android:layout_width="match_parent"
         app:layout_constraintTop_toBottomOf="@id/fCapacity"
         android:id="@+id/tCapacity"
+        android:hint="Enter two wheeler capcity"
         android:layout_height="wrap_content"/>
     <EditText
         android:layout_width="match_parent"
         app:layout_constraintTop_toBottomOf="@id/tCapacity"
         android:id="@+id/owner"
+        android:hint="Enter owner name"
+        android:layout_height="wrap_content"/>
+    <NumberPicker
+        android:layout_width="wrap_content"
+        android:id="@+id/parkTime"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/owner"
         android:layout_height="wrap_content"/>
 
     <Button
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/owner"
+        app:layout_constraintTop_toBottomOf="@id/parkTime"
         android:id="@+id/stMp"
         android:text="SignUp"
         android:layout_width="wrap_content"

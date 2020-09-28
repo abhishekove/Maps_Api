@@ -7,6 +7,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.AsyncTask;
@@ -21,6 +22,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -122,7 +124,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(MapActivity.this);
     }
     void addMarker(){
-        List<parking> parkings= (List<parking>) getIntent().getSerializableExtra("places");
+        final List<parking> parkings= (List<parking>) getIntent().getSerializableExtra("places");
         for (parking park:parkings){
             LatLng latLng=new LatLng(Double.parseDouble(park.getLat()),Double.parseDouble(park.getLng()));
             MarkerOptions options=new MarkerOptions();
@@ -130,6 +132,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             options.title(park.getName());
             mMap.addMarker(options);
         }
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                Intent intent=new Intent(MapActivity.this,InfoPage.class);
+                for(int i=0;i<parkings.size();i++){
+                    if(parkings.get(i).getName().equals(marker.getTitle())){
+                        intent.putExtra("places",parkings.get(i));
+                        break;
+                    }
+                }
+                startActivity(intent);
+                return false;
+            }
+        });
     }
 
     private void getLocationPermission(){

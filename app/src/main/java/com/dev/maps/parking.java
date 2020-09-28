@@ -6,7 +6,7 @@ public class parking implements Serializable {
     public parking() {
     }
 
-    private Long fCapacity;
+    private String fCapacity;
     private String tCapacity;
     private String time;
     private String name;
@@ -19,7 +19,7 @@ public class parking implements Serializable {
         this.name = name;
     }
 
-    public parking(Long fCapacity, String tCapacity, String time, String name, String lng, String lat, String owner) {
+    public parking(String fCapacity, String tCapacity, String time, String name, String lng, String lat, String owner) {
         this.fCapacity = fCapacity;
         this.tCapacity = tCapacity;
         this.time = time;
@@ -47,7 +47,7 @@ public class parking implements Serializable {
         this.lat = lat;
     }
 
-    public parking(Long fCapacity, String tCapacity, String time, String lng, String lat, String owner) {
+    public parking(String fCapacity, String tCapacity, String time, String lng, String lat, String owner) {
         this.fCapacity = fCapacity;
         this.tCapacity = tCapacity;
         this.time = time;
@@ -56,11 +56,11 @@ public class parking implements Serializable {
         Owner = owner;
     }
 
-    public Long getfCapacity() {
+    public String getfCapacity() {
         return fCapacity;
     }
 
-    public void setfCapacity(Long fCapacity) {
+    public void setfCapacity(String fCapacity) {
         this.fCapacity = fCapacity;
     }
 
@@ -88,7 +88,7 @@ public class parking implements Serializable {
         Owner = owner;
     }
 
-    public parking(Long fCapacity, String tCapacity, String time, String owner) {
+    public parking(String fCapacity, String tCapacity, String time, String owner) {
         this.fCapacity = fCapacity;
         this.tCapacity = tCapacity;
         this.time = time;
