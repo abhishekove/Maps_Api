@@ -112,7 +112,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void moveCamera(LatLng latLng, float zoom){
         Log.d(TAG, "moveCamera: moving the camera to: lat: " + latLng.latitude + ", lng: " + latLng.longitude );
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, zoom));
-//        addOthers(latLng.latitude,latLng.longitude);
+        addMarker();
     }
 
     private void initMap(){
@@ -124,7 +124,11 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     void addMarker(){
         List<parking> parkings= (List<parking>) getIntent().getSerializableExtra("places");
         for (parking park:parkings){
-            Log.d(TAG, "addMarker: "+park);
+            LatLng latLng=new LatLng(Double.parseDouble(park.getLat()),Double.parseDouble(park.getLng()));
+            MarkerOptions options=new MarkerOptions();
+            options.position(latLng);
+            options.title(park.getName());
+            mMap.addMarker(options);
         }
     }
 

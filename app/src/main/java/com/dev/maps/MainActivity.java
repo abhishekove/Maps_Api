@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
 
     //vars
     private Boolean mLocationPermissionsGranted = false;
-    private GoogleMap mMap;
     private FusedLocationProviderClient mFusedLocationProviderClient;
 
     Button button,addPlace;
